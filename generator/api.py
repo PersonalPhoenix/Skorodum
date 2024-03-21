@@ -308,10 +308,10 @@ class QuestionUpdateAPI(UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class QuestionDeleteAPI(APIView):
+class QuestionDeleteAPI(DestroyAPIView):
 
     serializer_class = QuestionSerializer
-    queryset = Round.objects.all()
+    queryset = Question.objects.all()
 
 
 class QuestionSearchAPI(APIView):

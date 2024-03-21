@@ -96,9 +96,10 @@ class Question(models.Model):
     class Meta:
         db_table = 'questions'
 
-    round_id = models.ManyToManyField(
+    round_id = models.ForeignKey(
         Round,
-        blank=True,
+        on_delete=models.CASCADE,
+        default=???????
     )
     question_type = models.CharField(
         max_length=300,
