@@ -314,12 +314,15 @@ class QuestionDeleteAPI(APIView):
     queryset = Round.objects.all()
 
 
-class QuestionSearchAPI(APIView):
+class QuestionSearchAPI(ListAPIView):
+    serializer_class = QuestionSerializer
 
-    def get(self, request, *args, **kwargs):
-        ids = kwargs['ids'].split(',')
-        return Response(Question.objects.filter(category__id__in=ids).values().distinct(), status=status.HTTP_200_OK)
+    def get_queryset(self):
+        query = self.request.query_params.get('query', '')
 
+        return Question.objects.filter(
+            Q(question_text__icontains=query),
+        )
 
 # ------------------------------------
 # CATEGORY
