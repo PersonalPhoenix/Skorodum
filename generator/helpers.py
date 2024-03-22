@@ -153,7 +153,7 @@ def create_game(data) -> Tuple[Dict, bool]:
         )
 
         for current_question in questions:
-            answers = current_question.pop('answers')
+            answerZ = current_question.strip('[]')
             media_data = current_question['media_data']
             question = Question.objects.create(
                 question_type=current_question['type'],
@@ -164,15 +164,10 @@ def create_game(data) -> Tuple[Dict, bool]:
                 video_before=media_data['image']['before'],
                 video_after=media_data['image']['after'],
                 time_to_answer=current_question['time_to_answer'],
+                answers=answerZ,
+                correct_answer=current_question['correct_answer']
             )
             question.round_id.add(_round)
-
-            for answer in answers:
-                AnswerOptions.objects.create(
-                    quest_id=question,
-                    answer=answer,
-                    answer_is_correct=answer==current_question['correct_answer'],
-                )
 
     return model_to_dict(game), True
 
@@ -188,7 +183,7 @@ def create_round(data):
     questions = data.pop('questions')
 
     for current_question in questions:
-        answers = current_question.pop('answers')
+        answerZ = current_question('answers').strip('[]')
         media_data = current_question['media_data']
         question = Question.objects.create(
             question_type=current_question['type'],
@@ -199,7 +194,7 @@ def create_round(data):
             video_before=media_data['image']['before'],
             video_after=media_data['image']['after'],
             time_to_answer=current_question['time_to_answer'],
-            answers=current_question['answers'],
+            answers=answerZ,
             correct_answer=current_question['correct_answer']
         )
 

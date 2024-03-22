@@ -86,7 +86,7 @@ urlpatterns = (
     # # GET методы для Question
     path('api/v1/get-question/<int:pk>/', QuestionGetOneAPI.as_view()), # получить 1 вопрос со всей инфой
     path('api/v1/get-all-questions/', QuestionGetAllAPI.as_view()), # получить все вопросы, без ответов на вопросы
-    path('api/v1/question-search/<str:ids>/', QuestionSearchAPI.as_view()), # получить все вопросы, по указаным категориями
+    path('api/v1/question-search/', QuestionSearchAPI.as_view()), # получить все вопросы, по указаным категориями
 
     # # PATCH / PUT методы для Question
     path('api/v1/update-question/<int:pk>/', QuestionUpdateAPI.as_view()), # обновить / заменить 1 вопрос
