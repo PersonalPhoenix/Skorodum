@@ -1,4 +1,7 @@
-from django.urls import path
+from django.urls import (
+    path,
+)
+
 from .api import (
     GameCreateAPI,
     GameGetAPI,
@@ -31,7 +34,7 @@ from .api import (
     FileUploadAPI,
     SecondWayFileUploadAPI,
     upload_file,
-    download_file
+    download_file,
 )
 
 

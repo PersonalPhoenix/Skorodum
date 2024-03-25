@@ -1,4 +1,7 @@
-from typing import Dict, Tuple
+from typing import (
+    Dict, 
+    Tuple,
+)
 
 from django.forms.models import (
     model_to_dict,
@@ -6,18 +9,22 @@ from django.forms.models import (
 from django.shortcuts import (
     get_object_or_404,
 )
+from rest_framework.response import (
+    Response,
+)
+from rest_framework import (
+    status,
+)
 
 from .models import (
     Game, 
     Round, 
     Question, 
-   # AnswerOptions,
 )
 from .serializer import(
     GameSerializer,
     RoundSerializer,
     QuestionSerializer,
-  #  AnswerOptionsSerializer,
 )
 
 
@@ -58,6 +65,7 @@ def get_one_game_with_rounds(request, *args, **kwargs) -> Dict:
 
     return result
 
+
 def update_game_with_rounds(request, *args, **kwargs):
     game = get_object_or_404(Game, id=kwargs['pk'])
     game_serializer = GameSerializer(game, data=request.data)
@@ -93,6 +101,7 @@ def update_game_with_rounds(request, *args, **kwargs):
         return Response(game_serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(game_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 def get_names_all_games() -> Dict:
     """Формирует словарь с информацией о всех играх.
@@ -200,93 +209,7 @@ def create_round(data):
 
         question.round_id.add(_round)
 
-        # for answer in answers:
-        #     AnswerOptions.objects.create(
-        #         quest_id=question,
-        #         answer=answer,
-        #         answer_is_correct=answer==current_question['correct_answer'],
-        #     )
-
     return model_to_dict(_round), True
-
-
-# def get_one_game_with_full_info(request, *args, **kwargs):
-    
-#     from django.db.models import Prefetch
-
-#     game = Game.objects.prefetch_related('round_set').get(id=kwargs['pk'])
-#     rounds = game.round_set.prefetch_related('question_set').filter(game_id=game)
-#     questions = [_round.question_set.filter(round_id=_round) for _round in rounds]
-
-#     game_info = {
-#         'name': game.name,
-#         'theme': game.theme,
-#         'client': game.client,
-#         'date': game.date,
-#     }
-#     game_settings_tactics = {
-#         'remove_answer': game.remove_answer,
-#         'one_for_all': game.one_for_all,
-#         'question_bet': game.question_bet,
-#         'all_in': game.all_in,
-#         'team_bet': game.team_bet,
-#     }
-#     rounds = [
-#         {
-#             'type': '',
-#             'settings': {
-#                 'is_test': '',
-#                 'name': '',
-#                 'display_name': '',
-#                 'time_to_answer': '',
-#                 'use_special_tactics': '',
-#             },
-#             'questions': [
-#                 {   
-#                     'type': '',
-#                     'question': '',
-#                     'answers': [
-
-#                     ],
-#                     'correct_answer': '',
-#                     'time_to_answer': '',
-#                     'media_data': [
-#                         {
-#                             'show_image': '',
-#                             'video': {
-#                                 'before': '',
-#                                 'after': '',
-#                             },
-#                             'image': {
-#                                 'before': '',
-#                                 'after': '',
-#                                 'player_displayed': '',
-#                             },
-#                         },
-#                     ],
-#                 },
-#             ],
-#         },
-#     ]
-
-#     result = {
-#         "game": {
-#             "game_info": {
-#                 **game_info,
-#             },
-#             'game_settings': {
-#                 'tactics': {
-#                     **game_settings_tactics,
-#                 },
-#                 'skip_emails': game.skip_emails,
-#             },
-#             'rounds': {
-#                 game.round_set.values().filter(),
-#             },
-#         },
-#     }
-
-#     return game
 
 
 def create_question(data):
@@ -304,13 +227,6 @@ def create_question(data):
         answers=data['answers']
     )
 
-    # for answer in data['answers']:
-    #     AnswerOptions.objects.create(
-    #         quest_id=question,
-    #         answer=answer,
-    #         answer_is_correct=answer==data['correct_answer'],
-    #     )
-
     if data['round_id']:
         question.add(Round.objects.get(id=data['round_id']))
 
@@ -320,7 +236,6 @@ def create_question(data):
 def get_one_question(data, *args, **kwargs):
 
     question = Question.objects.get(id=kwargs['pk'])
-    #answer_options = question.answeroptions_set.all().values()
 
     result = {
         "type": question.question_type,

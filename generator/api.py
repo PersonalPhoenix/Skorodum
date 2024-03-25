@@ -1,26 +1,48 @@
-from django.db.models import Q
+import io
+import os
+
 from rest_framework.generics import (
     DestroyAPIView, 
     UpdateAPIView,
     ListAPIView,
 )
-from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-import io
-import os
-from wsgiref.util import FileWrapper
-from django.http import HttpResponse
-from django.conf import settings
-from django.http import StreamingHttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework.views import (
+    APIView,
+)
+from rest_framework.decorators import (
+    api_view,
+)
+from rest_framework.response import (
+    Response,
+)
+from rest_framework import (
+    status,
+)
+from django.shortcuts import (
+    get_object_or_404,
+)
+from django.http import (
+    HttpResponse,
+)
+from django.db.models import (
+    Q,
+)
+from wsgiref.util import (
+    FileWrapper,
+)
+from django.http import (
+    HttpResponse,
+)
+from django.conf import (
+    settings,
+)
+from django.http import (
+    StreamingHttpResponse,
+)
+
 from .serializer import *
 from .helpers import (
     get_one_game_with_rounds, 
-    update_game_with_rounds,
     get_names_all_games,
     get_game_for_json,
     create_game,
@@ -30,7 +52,9 @@ from .helpers import (
     create_custom_style,
 )
 
-from docx import Document
+from docx import (
+    Document,
+)
 
 
 # ------------------------------------
@@ -69,15 +93,18 @@ class GameGetNamesAPI(APIView):
     def get(self, request, *args, **kwargs):
         return Response(get_names_all_games(), status=status.HTTP_200_OK)
 
+
 class SecondWayFileUploadAPI(APIView):
     def post(self, request, *args, **kwargs):
         queryset = MediaFile.objects.all()
         serializer_class = MediaFileSerializer(data=request.data)
+
         if serializer_class.is_valid():
-          serializer_class.save()
-          return Response(serializer_class.data, status=status.HTTP_201_CREATED)
+            serializer_class.save()
+            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
         else:
-          return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def download_file(request):
@@ -95,13 +122,17 @@ def download_file(request):
     else:
         return HttpResponse(status=400)
 
+
 @api_view(['POST'])
 def upload_file(request):
     file_serializer = FileSerializer(data=request.data)
     if file_serializer.is_valid():
         file = file_serializer.save()
+
         return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+
     return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class FileUploadAPI(APIView):
 
@@ -117,8 +148,6 @@ class FileUploadAPI(APIView):
 
 class GameUpdateAPI(UpdateAPIView):
 
-    # serializer_class = GameSerializer
-    # queryset = Game.objects.all()
     def post(self, request, *args, **kwargs):
         game = get_object_or_404(Game, id=kwargs['pk'])
         game_serializer = GameSerializer(game, data=request.data)
@@ -210,15 +239,10 @@ class GameUploadWordAPI(APIView):
                 document.add_paragraph(f'Отображать на экране: {"Да" if question["player_displayed"] else "Нет"}').style = custom_info
 
         buffer = io.BytesIO()
-        # save your memory stream
         document.save(buffer) 
-        # rewind the stream to a file 
         buffer.seek(0)  
 
-        # put them to streaming content response 
-        # within docx content_type
         response = StreamingHttpResponse(
-            # use the stream's content
             streaming_content=buffer,  
             content_type='application/vnd.openxmlformats-officedocument.wordprocessingm'
         )
@@ -310,8 +334,17 @@ class QuestionUpdateAPI(UpdateAPIView):
 
 class QuestionDeleteAPI(APIView):
 
-    serializer_class = QuestionSerializer
-    queryset = Round.objects.all()
+    def delete(self, request, pk):
+        try:
+            question = Question.objects.get(pk=pk)
+        except Question.DoesNotExist:
+            return Response({"detail": "Вопрос не найден."}, status=status.HTTP_404_NOT_FOUND)
+
+        question.round_id.clear()
+        question.category.clear()
+        question.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class QuestionSearchAPI(ListAPIView):
@@ -323,6 +356,7 @@ class QuestionSearchAPI(ListAPIView):
         return Question.objects.filter(
             Q(question_text__icontains=query),
         )
+
 
 # ------------------------------------
 # CATEGORY
@@ -364,6 +398,8 @@ class CategoryGetKeysAPI(APIView):
         result = Category.objects.filter(id__in=ids).values()
 
         return Response(result, status=status.HTTP_200_OK)
+
+
 class CategorySearchAPI(ListAPIView):
     serializer_class = CategorySerializer
 
@@ -373,7 +409,6 @@ class CategorySearchAPI(ListAPIView):
         return Category.objects.filter(
             Q(name__icontains=query),
         )
-
 
 
 class CategoryUpdateAPI(UpdateAPIView):
