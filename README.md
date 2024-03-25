@@ -12,11 +12,11 @@
 Запуск выполняется согласно инструкции, а также открыв консоль в этой папке
 (Windows: Shift+ПКМ > Открыть консоль/powershell)
 
-`python manage.py runserver` — запускает сервер на текущей машине (localhost)
-`python manage.py runserver 192.168.33.33:8888` — запускает сервер на IP 192.168.33.33 c портом 8888 (прим. wifi)
-`python manage.py makemigrations` — при редактировании модели создает миграции для БД
-`python manage.py migrate` — мигрирует изменения модели в БД
-`python manage.py createsuperuser` — создает админа (для доступа к http://serverip/admin)
+- `python manage.py runserver` — запускает сервер на текущей машине (localhost)
+- `python manage.py runserver 192.168.33.33:8888` — запускает сервер на IP 192.168.33.33 c портом 8888 (прим. wifi)
+- `python manage.py makemigrations` — при редактировании модели создает миграции для БД
+- `python manage.py migrate` — мигрирует изменения модели в БД
+- `python manage.py createsuperuser` — создает админа (для доступа к http://serverip/admin)
 
 ## Особенности деплоя под linux
 
