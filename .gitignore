@@ -7,7 +7,7 @@ db.sqlite3
 media
 **/__pycache__
 generator/__pycache__/*.pyc
-
+redist
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
