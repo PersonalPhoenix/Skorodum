@@ -4,5 +4,7 @@ cls
 @chcp 65001
 set /p user_input=Введите IP: 
 cd ../
+python manage.py makemigrations
+python manage.py migrate
 python manage.py runserver %user_input%:8000
 pause
