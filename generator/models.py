@@ -1,5 +1,5 @@
 from django.db import models
-import uuid
+
 
 class Game(models.Model):
     """Модель игры."""
@@ -38,16 +38,11 @@ class Game(models.Model):
         default=False,
     )
 
-# class MediaFile(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     mediaFile = models.FileField(blank=False, null=False)
-    
-#     def __str__(self):
-#         return self.mediaFile.name
 
 class File(models.Model):
     file = models.FileField(upload_to='media/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
 
 class Round(models.Model):
     """Модель раунда."""
@@ -76,6 +71,10 @@ class Round(models.Model):
     )
     use_special_tactics = models.BooleanField(
         default=False,
+    )
+    blitz_score = models.CharField(
+        max_length=300,
+        default='0',
     )
 
 
@@ -147,21 +146,3 @@ class Question(models.Model):
         max_length=300,
         blank=True
     )
-
-
-# class AnswerOptions(models.Model):
-#     """Модель ответа на вопрос."""
-
-#     class Meta:
-#         db_table = 'answer_options'
-
-#     quest_id = models.ForeignKey(
-#         Question, 
-#         on_delete=models.CASCADE,
-#     )
-#     answer = models.TextField(
-
-#     )
-#     answer_is_correct = models.BooleanField(
-#         default=False,
-#     )
