@@ -1,4 +1,4 @@
 {
-    "question_type": "Просто вопрос",
-    "question_text": "Зачем?"
+    "question_type": "Строка",
+    "question_text": "Строка"
 }
