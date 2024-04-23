@@ -1,0 +1,12 @@
+{
+    "show_image": "boolean",
+    "image_before": "целое число",
+    "image_after": "целое число",
+    "video_before": "целое число",
+    "video_after": "целое число",
+    "player_displayed": "boolean",
+    "time_to_answer": "целое число",
+    "answers": "строка",
+    "correct_answer": "строка",
+    "round_id": "список целых чисел (id раундов)"
+}

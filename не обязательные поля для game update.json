@@ -1,0 +1,5 @@
+{
+    "names_team_members": "boolean",
+    "skip_emails": "boolean",
+    "table_number": "boolean"
+}

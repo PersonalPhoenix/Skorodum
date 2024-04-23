@@ -1,0 +1,12 @@
+{
+    "question_set": "Список словарей",
+    "simple_round": "boolean",
+    "test_round": "boolean",
+    "blitz": "boolean",
+    "delete_wrong_answer": "целое число",
+    "bet_on": "целое число",
+    "one_for_all": "целое число",
+    "all_in": "целое число",
+    "points_per_barrel": "целое число",
+    "answer_time": "целое число"
+}
