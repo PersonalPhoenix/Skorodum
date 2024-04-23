@@ -18,9 +18,6 @@ from rest_framework.response import (
 from rest_framework import (
     status,
 )
-from django.shortcuts import (
-    get_object_or_404,
-)
 from django.http import (
     HttpResponse,
 )
@@ -39,27 +36,37 @@ from django.conf import (
 from django.http import (
     StreamingHttpResponse,
 )
-
-from .serializer import *
-from .helpers import (
-    get_one_game_with_rounds, 
-    get_names_all_games,
-    get_game_for_json,
-    create_game,
-    create_round,
-    create_question,
-    get_one_question,
-    create_custom_style,
-)
-
 from docx import (
     Document,
 )
 
+from .models import (
+    Game,
+    Round,
+    Question,
+    Category,
+)
+from .serializer import (
+    CategorySerializer,
+    QuestionSerializer,
+    FileSerializer,
+    RoundSerializer,
+)
+from .helpers.game_helpers import (
+    create_game,
+    get_names_all_games,
+    get_one_game_with_rounds,
+    get_game_for_json,
+    create_custom_style,
+)
+from .helpers.round_helpers import (
+    create_round,
+)
+from .helpers.question_helpers import (
+    create_question,
+    get_one_question,
+)
 
-# ------------------------------------
-# GAME
-# ------------------------------------
 
 class GameCreateAPI(APIView):
 
@@ -80,30 +87,10 @@ class GameGetAPI(APIView):
         return Response(result, status=status.HTTP_200_OK)
 
 
-class GameGetInfoAPI(APIView):
-
-    def get(self, request, *args, **kwargs):
-        result = get_one_game_with_full_info(request, *args, **kwargs)
-
-        return Response(result, status=status.HTTP_200_OK)
-
-
 class GameGetNamesAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         return Response(get_names_all_games(), status=status.HTTP_200_OK)
-
-
-class SecondWayFileUploadAPI(APIView):
-    def post(self, request, *args, **kwargs):
-        queryset = MediaFile.objects.all()
-        serializer_class = MediaFileSerializer(data=request.data)
-
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -134,47 +121,13 @@ def upload_file(request):
     return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FileUploadAPI(APIView):
-
-    def post(self, request, *args, **kwargs):
-
-        file_serializer = MediaFileSerializer(data=request.data)
-
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class GameUpdateAPI(UpdateAPIView):
 
-    def post(self, request, *args, **kwargs):
-        game = get_object_or_404(Game, id=kwargs['pk'])
-        game_serializer = GameSerializer(game, data=request.data)
+    def put(self, request, *args, **kwargs):
 
-        if game_serializer.is_valid():
-            game_serializer.save()
+        Game.objects.filter(id=kwargs['pk']).update(**request.data)
 
-            for round_data in request.data.get('rounds', []):
-                round = game.round_set.get(id=round_data['id'])
-                round_serializer = RoundSerializer(round, data=round_data)
-
-                if round_serializer.is_valid():
-                    round_serializer.save()
-
-                    for question_data in round_data.get('questions', []):
-                        question = round.question_set.get(id=question_data['id'])
-                        question_serializer = QuestionSerializer(question, data=question_data)
-
-                        if question_serializer.is_valid():
-                            question_serializer.save()
-                        else:
-                            return Response(question_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response(round_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(game_serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(game_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return HttpResponse('Ok', status=200)
 
 
 class GameDeleteAPI(DestroyAPIView):

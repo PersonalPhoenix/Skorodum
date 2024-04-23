@@ -8,15 +8,19 @@ class Game(models.Model):
         db_table = 'games'
 
     name = models.CharField(
+        verbose_name='Имя игры',
         max_length=300,
     )
     theme = models.CharField(
+        verbose_name='Тема игры',
         max_length=300,
     )
     client = models.CharField(
-        max_length=300, 
+        verbose_name='Заказчик',
+        max_length=300,
     )
     date = models.CharField(
+        verbose_name='Дата игры',
         max_length=300,
     )
     remove_answer = models.PositiveIntegerField(
@@ -85,6 +89,7 @@ class Category(models.Model):
         db_table = 'categories'
 
     name = models.CharField(
+        verbose_name='наименование категории',
         max_length=100,
     )
 
