@@ -19,6 +19,7 @@ from .api import (
     QuestionUpdateAPI,
     QuestionDeleteAPI,
     QuestionSearchAPI,
+    QuestionWordAPI,
     CategoryCreateAPI,
     CategoryGetAllAPI,
     CategoryGetAPI,
@@ -52,6 +53,8 @@ urlpatterns = (
     path('api/v1/question-search/', QuestionSearchAPI.as_view()), # получить все вопросы, по указаным категориями
     path('api/v1/update-question/<int:pk>/', QuestionUpdateAPI.as_view()), # обновить / заменить 1 вопрос
     path('api/v1/delete-question/<int:pk>/', QuestionDeleteAPI.as_view()), # удалить вопрос
+    path('api/v1/questions-in-word/', QuestionWordAPI.as_view()), # выгрузить вопросы в word
+    path('api/v1/questions-in-word/<str:ids>/', QuestionWordAPI.as_view()), # выгрузить вопросы в word
 
     path('api/v1/create-category/', CategoryCreateAPI.as_view()), # создать 1 категорию
     path('api/v1/get-categories/', CategoryGetAllAPI.as_view()), # получить все категории

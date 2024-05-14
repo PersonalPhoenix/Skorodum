@@ -311,6 +311,71 @@ class QuestionSearchAPI(ListAPIView):
         )
 
 
+class QuestionWordAPI(APIView):
+
+    def get(self, request, *args, **kwargs):
+        ids = kwargs.get('ids', '')
+
+        mapping = [
+            'question_type',
+            'category__name',
+            'question_text',
+            'show_image',
+            'image_before',
+            'image_after',
+            'video_before',
+            'video_after',
+            'player_displayed',
+            'time_to_answer',
+            'answers',
+            'correct_answer',
+            'open_question',
+            'close_question',
+            'media_question',
+        ]
+        if ids:
+            data = Question.objects.filter(id__in=ids.split(',')).select_related('category').values(
+                *mapping,
+            )
+        else:
+            data = Question.objects.all().select_related('category').values(
+                *mapping,
+            )
+
+        document = Document()
+
+        for question in data:
+            document.add_heading(f'Тип вопроса: {question["question_type"]}')
+            document.add_heading(f'Категория: {question["category__name"]}')
+
+            document.add_paragraph(f'Вопрос: {question["question_text"]}')
+            document.add_paragraph(str(question['show_image']))
+            document.add_paragraph(question['image_before'])
+            document.add_paragraph(question['image_after'])
+            document.add_paragraph(question['video_before'])
+            document.add_paragraph(question['video_after'])
+            document.add_paragraph(str(question['player_displayed']))
+            document.add_paragraph(str(question['time_to_answer']))
+            document.add_paragraph(question['answers'])
+            document.add_paragraph(question['correct_answer'])
+            document.add_paragraph(str(question['open_question']))
+            document.add_paragraph(str(question['close_question']))
+            document.add_paragraph(str(question['media_question']))
+
+        buffer = io.BytesIO()
+        document.save(buffer) 
+        buffer.seek(0)
+
+        response = StreamingHttpResponse(
+            streaming_content=buffer,  
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingm'
+        )
+        response['Content-Disposition'] = 'attachment;filename=Test.docx'
+        response["Content-Encoding"] = 'UTF-8'
+
+        return response
+
+
 # ------------------------------------
 # CATEGORY
 # ------------------------------------

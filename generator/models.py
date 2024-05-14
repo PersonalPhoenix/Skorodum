@@ -151,3 +151,12 @@ class Question(models.Model):
         max_length=300,
         blank=True
     )
+    open_question = models.BooleanField(
+        default=False,
+    )
+    close_question = models.BooleanField(
+        default=False,
+    )
+    media_question = models.BooleanField(
+        default=False,
+    )
