@@ -38,3 +38,14 @@ def create_round(data):
         question.round_id.add(_round)
 
     return model_to_dict(_round), True
+
+
+def get_one_round(request, *args, **kwargs):
+    _round = Round.objects.prefetch_related('question_set').get(id=kwargs['pk'])
+
+    return {
+        **model_to_dict(_round),
+        'questions': list(
+            (i for i in _round.question_set.filter().values()),
+        ),
+    }

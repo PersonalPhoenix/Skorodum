@@ -61,6 +61,7 @@ from .helpers.game_helpers import (
 )
 from .helpers.round_helpers import (
     create_round,
+    get_one_round,
 )
 from .helpers.question_helpers import (
     create_question,
@@ -219,6 +220,12 @@ class RoundCreateAPI(APIView):
             return Response(obj, status=status.HTTP_201_CREATED)
 
         return Response(obj, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RoundGetAPI(APIView):
+
+    def get(self, request, *args, **kwargs):
+        return Response(get_one_round(request, *args, **kwargs), status=status.HTTP_200_OK)
 
 
 class RoundUpdateAPI(UpdateAPIView):

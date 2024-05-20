@@ -11,6 +11,7 @@ from .api import (
     GameUploadJsonAPI,
     GameUploadWordAPI,
     RoundCreateAPI,
+    RoundGetAPI,
     RoundUpdateAPI,
     RoundDeleteAPI,
     QuestionCreateAPI,
@@ -44,6 +45,7 @@ urlpatterns = (
     path('api/v1/download-game-to-word/<int:pk>/', GameUploadWordAPI.as_view()), # выгрузить 1 игру в word
 
     path('api/v1/create-round/', RoundCreateAPI.as_view()), # создать 1 раунд
+    path('api/v1/get-round/<int:pk>/', RoundGetAPI.as_view()), # получить 1 раунд
     path('api/v1/update-round/<int:pk>/', RoundUpdateAPI.as_view()), # обновить / заменить 1 раунд
     path('api/v1/delete-round/<int:pk>/', RoundDeleteAPI.as_view()), # удалить 1 раунд
 
