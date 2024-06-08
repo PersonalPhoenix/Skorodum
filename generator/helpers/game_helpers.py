@@ -1,6 +1,7 @@
 from typing import (
     Dict,
     Tuple,
+    List,
 )
 
 from django.forms.models import (
@@ -152,3 +153,49 @@ def create_custom_style(document) -> None:
     custom_theme_info.font.size = Pt(14)
 
     return custom_game_name_header, custom_theme_header, custom_theme_info
+
+
+def get_game(id_):
+    needed_fields = [
+        'id', 
+        'question_type',
+        'question_text',
+        'show_image',
+        'image_before',
+        'image_after',
+        'video_before',
+        'video_after',
+        'player_displayed',
+        'time_to_answer',
+        'answers',
+        'correct_answer',
+        'open_question',
+        'close_question',
+        'media_question',
+        'category__name',
+        'round_id__id',
+    ]
+
+    game = Game.objects.get(id=id_)
+    rounds = game.round_set.all()
+
+    answer = {
+        **model_to_dict(game),
+        'rounds': [
+            {
+                **model_to_dict(round_),
+                'questions': round_.question_set.all().values(*needed_fields),
+            }
+            for round_ in rounds
+        ]
+    }
+
+    return answer
+
+
+def get_selected_games(ids: List[int]) -> Dict:
+    result = {}
+    for id_ in ids:
+        result[f'game{int(id_)}'] = get_game(int(id_))
+
+    return result

@@ -10,6 +10,8 @@ from .api import (
     GameUpdateAPI,
     GameUploadJsonAPI,
     GameUploadWordAPI,
+    GameGetSelectedAPI,
+    GameUploadZipAPI,
     RoundCreateAPI,
     RoundGetAPI,
     RoundUpdateAPI,
@@ -39,10 +41,12 @@ urlpatterns = (
     path('api/v1/create-game/', GameCreateAPI.as_view()), # создать 1 игру
     path('api/v1/get-game/<int:pk>/', GameGetAPI.as_view()), # получить 1 игру с раундами, без вопросов
     path('api/v1/get-names-games/', GameGetNamesAPI.as_view()), # получить только имена всех игр
+    path('api/v1/get-games/<str:ids>/', GameGetSelectedAPI.as_view()), # получить выбранные игры
     path('api/v1/update-game/<int:pk>/', GameUpdateAPI.as_view()), # обновить / заменить 1 игру
     path('api/v1/delete-game/<int:pk>/', GameDeleteAPI.as_view()), # удалить 1 игру
     path('api/v1/download-game-to-json/<int:pk>/', GameUploadJsonAPI.as_view()), # выгрузить 1 игру в json
     path('api/v1/download-game-to-word/<int:pk>/', GameUploadWordAPI.as_view()), # выгрузить 1 игру в word
+    path('api/v1/download-game-to-zip/<str:ids>/', GameUploadZipAPI.as_view()), # получить выбранные игры в zip
 
     path('api/v1/create-round/', RoundCreateAPI.as_view()), # создать 1 раунд
     path('api/v1/get-round/<int:pk>/', RoundGetAPI.as_view()), # получить 1 раунд

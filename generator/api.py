@@ -58,6 +58,7 @@ from .helpers.game_helpers import (
     get_one_game_with_rounds,
     get_game_for_json,
     create_custom_style,
+    get_selected_games,
 )
 from .helpers.round_helpers import (
     create_round,
@@ -205,6 +206,17 @@ class GameUploadWordAPI(APIView):
         response["Content-Encoding"] = 'UTF-8'
 
         return response
+
+
+class GameGetSelectedAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        games = get_selected_games(kwargs.get('ids', '').split(','))
+
+        return Response(games, status=status.HTTP_200_OK)
+
+
+class GameUploadZipAPI(APIView):
+    pass
 
 
 # ------------------------------------
