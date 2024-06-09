@@ -6,6 +6,11 @@ from rest_framework.generics import (
     UpdateAPIView,
     ListAPIView,
 )
+import json
+import zipfile
+from io import (
+    BytesIO,
+)
 from rest_framework.views import (
     APIView,
 )
@@ -59,6 +64,7 @@ from .helpers.game_helpers import (
     get_game_for_json,
     create_custom_style,
     get_selected_games,
+    get_media,
 )
 from .helpers.round_helpers import (
     create_round,
@@ -210,13 +216,31 @@ class GameUploadWordAPI(APIView):
 
 class GameGetSelectedAPI(APIView):
     def get(self, request, *args, **kwargs):
-        games = get_selected_games(kwargs.get('ids', '').split(','))
-
-        return Response(games, status=status.HTTP_200_OK)
+        return Response(get_selected_games(kwargs.get('ids', '').split(',')), status=status.HTTP_200_OK)
 
 
 class GameUploadZipAPI(APIView):
-    pass
+    def get(self, request, *args, **kwargs):
+        ids = kwargs.get('ids', '').split(',')
+        games = get_selected_games(ids)
+
+        response = HttpResponse(content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename="{len(ids)} games.zip"'
+        import re
+        with zipfile.ZipFile(response, 'w') as zipf:
+            count = 1
+            for game_id, game_data in games.items():
+                json_data = json.dumps(game_data, indent=4, ensure_ascii=False).encode('utf-8')
+                zipf.writestr(f'{game_id}.json', json_data)
+
+                medias = get_media(count)
+                for media in medias:
+                    for key, value in media.items():
+                        md_path = os.path.join(settings.MEDIA_ROOT, value)
+                        zipf.write(md_path, os.path.basename(md_path))
+            count += 1
+
+        return response
 
 
 # ------------------------------------

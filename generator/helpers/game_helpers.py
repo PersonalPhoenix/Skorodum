@@ -155,6 +155,12 @@ def create_custom_style(document) -> None:
     return custom_game_name_header, custom_theme_header, custom_theme_info
 
 
+def serialize_image_field(image_field):
+    if image_field and hasattr(image_field, 'name'):
+        return image_field.name.split('/')[-1]
+    return None
+
+
 def get_game(id_):
     needed_fields = [
         'id', 
@@ -184,7 +190,16 @@ def get_game(id_):
         'rounds': [
             {
                 **model_to_dict(round_),
-                'questions': round_.question_set.all().values(*needed_fields),
+                'questions':  [
+                    {
+                        **model_to_dict(question, fields=needed_fields), 
+                        'image_after': serialize_image_field(question.image_after),
+                        'image_before': serialize_image_field(question.image_before),
+                        'video_after': serialize_image_field(question.video_after),
+                        'video_before': serialize_image_field(question.video_before),
+                    } 
+                    for question in round_.question_set.all()
+                ],
             }
             for round_ in rounds
         ]
@@ -199,3 +214,16 @@ def get_selected_games(ids: List[int]) -> Dict:
         result[f'game{int(id_)}'] = get_game(int(id_))
 
     return result
+
+
+def get_media(game_id: int) -> Dict:
+    media_fields = [
+        'image_after',
+        'image_before',
+        'video_after',
+        'video_before',
+    ]
+    rounds = Round.objects.filter(game_id=game_id).values_list('id')
+    question_media = Question.objects.filter(round_id__in=rounds).values(*media_fields)
+
+    return question_media

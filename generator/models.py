@@ -104,59 +104,74 @@ class Question(models.Model):
         Round,
         blank=True,
     )
+
     question_type = models.CharField(
         max_length=300,
     )
+
     category = models.ManyToManyField(
         Category,
     )
+
     question_text = models.CharField(
         max_length=300,
     )
+
     show_image = models.BooleanField(
         default=False,
     )
-    image_before = models.CharField(
-        max_length=300,
+
+    image_before = models.ImageField(
+        upload_to='media/',
         null=True,
         blank=True,
     )
-    image_after = models.CharField(
-        max_length=300,
+
+    image_after = models.ImageField(
+        upload_to='media/',
         null=True,
         blank=True,
     )
-    video_before = models.CharField(
-        max_length=300,
+
+    video_before = models.FileField(
+        upload_to='media/',
         null=True,
         blank=True,
     )
-    video_after = models.CharField(
-        max_length=300,
+
+    video_after = models.FileField(
+        upload_to='media/',
         null=True,
         blank=True,
     )
+
     player_displayed = models.BooleanField(
         default=False,
     )
+
     time_to_answer = models.PositiveIntegerField(
         default=40
     )
+
     answers = models.CharField(
         max_length=300,
         null=True,
         blank=True
     )
+
     correct_answer= models.CharField(
         max_length=300,
         blank=True
     )
+
     open_question = models.BooleanField(
         default=False,
     )
+
     close_question = models.BooleanField(
         default=False,
     )
+
     media_question = models.BooleanField(
         default=False,
     )
