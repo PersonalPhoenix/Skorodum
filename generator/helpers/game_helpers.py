@@ -211,7 +211,7 @@ def get_game(id_):
 def get_selected_games(ids: List[int]) -> Dict:
     result = {}
     for id_ in ids:
-        result[f'game{int(id_)}'] = get_game(int(id_))
+        result[id_] = get_game(int(id_))
 
     return result
 

@@ -8,9 +8,7 @@ from rest_framework.generics import (
 )
 import json
 import zipfile
-from io import (
-    BytesIO,
-)
+
 from rest_framework.views import (
     APIView,
 )
@@ -226,19 +224,17 @@ class GameUploadZipAPI(APIView):
 
         response = HttpResponse(content_type='application/zip')
         response['Content-Disposition'] = f'attachment; filename="{len(ids)} games.zip"'
-        import re
+
         with zipfile.ZipFile(response, 'w') as zipf:
-            count = 1
             for game_id, game_data in games.items():
                 json_data = json.dumps(game_data, indent=4, ensure_ascii=False).encode('utf-8')
-                zipf.writestr(f'{game_id}.json', json_data)
+                zipf.writestr(f'game{game_id}.json', json_data)
 
-                medias = get_media(count)
+                medias = get_media(int(game_id))
                 for media in medias:
-                    for key, value in media.items():
+                    for _, value in media.items():
                         md_path = os.path.join(settings.MEDIA_ROOT, value)
                         zipf.write(md_path, os.path.basename(md_path))
-            count += 1
 
         return response
 
