@@ -33,28 +33,39 @@ def create_game(data) -> Tuple[Dict, bool]:
 
     for current_round in rounds:
         questions = current_round.pop('questions')
+        type_ = current_round['type']
         _round = Round.objects.create(
             game_id=game,
-            round_type=current_round['type'],
+            round_type=type_,
             **current_round['settings'],
         )
 
         for current_question in questions:
-            answerZ = current_question['answers']
-            media_data = current_question['media_data']
-            question = Question.objects.create(
-                question_type=current_question['type'],
-                question_text=current_question['question'],
-                show_image=media_data['show_image'],
-                image_before=media_data['video']['before'],
-                image_after=media_data['video']['after'],
-                video_before=media_data['image']['before'],
-                video_after=media_data['image']['after'],
-                time_to_answer=current_question['time_to_answer'],
-                answers=answerZ,
-                correct_answer=current_question['correct_answer']
-            )
-            question.round_id.add(_round)
+
+            if type_ != 'blitz':
+                answerZ = current_question['answers']
+                media_data = current_question['media_data']
+                question = Question.objects.create(
+                    question_type=current_question['type'],
+                    question_text=current_question['question'],
+                    show_image=media_data['show_image'],
+                    image_before=media_data['video']['before'],
+                    image_after=media_data['video']['after'],
+                    video_before=media_data['image']['before'],
+                    video_after=media_data['image']['after'],
+                    time_to_answer=current_question['time_to_answer'],
+                    answers=answerZ,
+                    correct_answer=current_question['correct_answer']
+                )
+                question.round_id.add(_round)
+
+            else:
+                question = Question.objects.create(
+                    question_type=current_question['type'],
+                    question_text=current_question['question'],
+                    correct_answer=current_question['correct_answer'],
+                )
+                question.round_id.add(_round)
 
     return model_to_dict(game), True
 
