@@ -9,6 +9,9 @@ from rest_framework.generics import (
 import json
 import zipfile
 
+from rest_framework.exceptions import (
+    NotFound,
+)
 from rest_framework.views import (
     APIView,
 )
@@ -54,6 +57,7 @@ from .serializer import (
     QuestionSerializer,
     FileSerializer,
     RoundSerializer,
+    GameSerializer,
 )
 from .helpers.game_helpers import (
     create_game,
@@ -88,9 +92,12 @@ class GameCreateAPI(APIView):
 class GameGetAPI(APIView):
 
     def get(self, request, *args, **kwargs):
-        result = get_one_game_with_rounds(request, *args, **kwargs)
+        try:
+            result = get_one_game_with_rounds(request, *args, **kwargs)
+            return Response(result, status=status.HTTP_200_OK)
 
-        return Response(result, status=status.HTTP_200_OK)
+        except Game.DoesNotExist:
+            raise NotFound(detail=f'Игра с id: {kwargs['pk']} не существует.')
 
 
 class GameGetNamesAPI(APIView):
@@ -129,17 +136,18 @@ def upload_file(request):
 
 class GameUpdateAPI(UpdateAPIView):
 
-    def put(self, request, *args, **kwargs):
-
-        Game.objects.filter(id=kwargs['pk']).update(**request.data)
-
-        return HttpResponse('Ok', status=200)
+    serializer_class = GameSerializer
+    queryset = Game.objects.all()
 
 
 class GameDeleteAPI(DestroyAPIView):
 
-    serializer_class = QuestionSerializer
-    queryset = Game.objects.all()
+    def delete(self, request, *args, **kwargs):
+        try:
+            Game.objects.get(id=kwargs['pk']).delete()
+            return HttpResponse(f'Игра с id: {kwargs['pk']} была удалена', status=200)
+        except Game.DoesNotExist:
+            raise NotFound(detail=f'Игра с id: {kwargs['pk']} не существует.')
 
 
 class GameUploadJsonAPI(APIView):
@@ -257,7 +265,13 @@ class RoundCreateAPI(APIView):
 class RoundGetAPI(APIView):
 
     def get(self, request, *args, **kwargs):
-        return Response(get_one_round(request, *args, **kwargs), status=status.HTTP_200_OK)
+
+        try:
+            result = get_one_round(request, *args, **kwargs)
+            return Response(result, status=status.HTTP_200_OK)
+
+        except Round.DoesNotExist:
+            raise NotFound(detail=f'Раунд с id: {kwargs['pk']} не существует')
 
 
 class RoundUpdateAPI(UpdateAPIView):
@@ -268,23 +282,26 @@ class RoundUpdateAPI(UpdateAPIView):
 
 class RoundDeleteAPI(DestroyAPIView):
 
-    serializer_class = QuestionSerializer
-    queryset = Round.objects.all()
+    def delete(self, request, *args, **kwargs):
+        try:
+            Round.objects.get(id=kwargs['pk']).delete()
+            return Response({'detail':f'Раунд с id: {kwargs['pk']} был удален'}, status=200)
+        except Round.DoesNotExist:
+            raise NotFound(detail=f'Раунд с id: {kwargs['pk']} не существует')
 
 
 # ------------------------------------
 # QUESTION
 # ------------------------------------
 
-class QuestionCreateAPI(APIView):
-    
-    def post(self, request, format=None):
-        obj, create = create_question(request.data)
 
-        if create:
-            return Response(obj, status=status.HTTP_201_CREATED)
-
-        return Response(obj, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def create_question(request):
+    serializer = QuestionSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuestionGetOneAPI(APIView):
@@ -330,7 +347,7 @@ class QuestionDeleteAPI(APIView):
         try:
             question = Question.objects.get(pk=pk)
         except Question.DoesNotExist:
-            return Response({"detail": "Вопрос не найден."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': f'Вопрос c id: {pk} не существует.'}, status=status.HTTP_404_NOT_FOUND)
 
         question.round_id.clear()
         question.category.clear()
@@ -443,9 +460,11 @@ class CategoryGetAllAPI(APIView):
 class CategoryGetAPI(APIView):
 
     def get(self, request, *args, **kwargs):
-        result = Category.objects.values().get(id=kwargs['pk'])
-
-        return Response(result, status=status.HTTP_200_OK)
+        try:
+            result = Category.objects.values().get(id=kwargs['pk'])
+            return Response(result, status=status.HTTP_200_OK)
+        except Category.DoesNotExist:
+            raise NotFound(detail=f'Категории с id: {kwargs['pk']} несуществует')
 
 
 class CategoryGetKeysAPI(APIView):
@@ -476,5 +495,9 @@ class CategoryUpdateAPI(UpdateAPIView):
 
 class CategoryDeleteAPI(DestroyAPIView):
 
-    serializer_class = CategorySerializer
-    queryset = Category.objects.all()
+    def delete(self, request, *args, **kwargs):
+        try:
+            Category.objects.get(id=kwargs['pk']).delete()
+            return HttpResponse(f'Категория с id: {kwargs['pk']} была удалена', status=200)
+        except Category.DoesNotExist:
+            raise NotFound(detail=f'Категория с id: {kwargs['pk']} не существует.')

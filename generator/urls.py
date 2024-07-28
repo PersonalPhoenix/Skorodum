@@ -16,7 +16,7 @@ from .api import (
     RoundGetAPI,
     RoundUpdateAPI,
     RoundDeleteAPI,
-    QuestionCreateAPI,
+    create_question,
     QuestionGetOneAPI,
     QuestionGetAllAPI,
     QuestionUpdateAPI,
@@ -53,7 +53,7 @@ urlpatterns = (
     path('api/v1/update-round/<int:pk>/', RoundUpdateAPI.as_view()), # обновить / заменить 1 раунд
     path('api/v1/delete-round/<int:pk>/', RoundDeleteAPI.as_view()), # удалить 1 раунд
 
-    path('api/v1/create-question/', QuestionCreateAPI.as_view()), # создать 1 вопрос
+    path('api/v1/create-question/', create_question), # создать 1 вопрос
     path('api/v1/get-question/<int:pk>/', QuestionGetOneAPI.as_view()), # получить 1 вопрос со всей инфой
     path('api/v1/get-all-questions/', QuestionGetAllAPI.as_view()), # получить все вопросы, без ответов на вопросы
     path('api/v1/question-search/', QuestionSearchAPI.as_view()), # получить все вопросы, по указаным категориями

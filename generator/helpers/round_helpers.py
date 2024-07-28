@@ -46,6 +46,6 @@ def get_one_round(request, *args, **kwargs):
     return {
         **model_to_dict(_round),
         'questions': list(
-            (i for i in _round.question_set.filter().values()),
+            (i for i in _round.question_set.all().values()),
         ),
     }

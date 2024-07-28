@@ -4,27 +4,34 @@ from django.forms.models import (
 
 from generator.models import (
     Question,
-    Round,
 )
 
 
 def create_question(data):
-    media_data = data['media_data']
-    question = Question.objects.create(
-        question_type=data['type'],
-        question_text=data['question'],
-        time_to_answer=data['time_to_answer'],
-        show_image=media_data['show_image'],
-        image_before=media_data['image']['before'],
-        image_after=media_data['image']['before'],
-        video_before=media_data['video']['before'],
-        video_after=media_data['video']['after'],
-        correct_answer=data['correct_answer'],
-        answers=data['answers']
-    )
+    media_data = data.get('media_data')
 
-    if data['round_id']:
-        question.add(Round.objects.get(id=data['round_id']))
+    if media_data:
+        question = Question.objects.create(
+            question_type=data['type'],
+            question_text=data['question'],
+            time_to_answer=data.get('time_to_answer', 0),
+            show_image=media_data.get('show_image', False),
+            image_before=media_data.get('image', {}).get('before'),
+            image_after=media_data.get('image', {}).get('after'),
+            video_before=media_data.get('video', {}).get('before'),
+            video_after=media_data.get('video', {}).get('after'),
+            correct_answer=data['correct_answer'],
+            answers=data.get('answers', '')
+        )
+    else:
+        question = Question.objects.create(
+            question_type=data['type'],
+            question_text=data['question'],
+            correct_answer=data['correct_answer'],
+        )
+
+    if round_id := data.get('round_id'):
+        question.rounds = round_id
 
     return model_to_dict(question), True
 
@@ -36,18 +43,18 @@ def get_one_question(data, *args, **kwargs):
     result = {
         "type": question.question_type,
         "question": question.question_text,
-        "answers": question.answer,
+        "answers": question.answers,
         "correct_answer": question.correct_answer,
         "time_to_answer": question.time_to_answer,
         "media_data": {
             "show_image": question.show_image,
             "video": {
-                "before": question.video_before,
-                "after": question.video_after,
+                "before": question.video_before or '',
+                "after": question.video_after or '',
             },
             "image": {
-                "before": question.image_before,
-                "after": question.image_before,
+                "before": question.image_before or '',
+                "after": question.image_before or '',
                 "player_displayed": question.player_displayed,
             },
         },

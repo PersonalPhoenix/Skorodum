@@ -125,24 +125,28 @@ class Question(models.Model):
         upload_to='media/',
         null=True,
         blank=True,
+        default=None,
     )
 
     image_after = models.ImageField(
         upload_to='media/',
         null=True,
         blank=True,
+        default=None,
     )
 
     video_before = models.FileField(
         upload_to='media/',
         null=True,
         blank=True,
+        default=None,
     )
 
     video_after = models.FileField(
         upload_to='media/',
         null=True,
         blank=True,
+        default=None,
     )
 
     player_displayed = models.BooleanField(
@@ -161,7 +165,6 @@ class Question(models.Model):
 
     correct_answer= models.CharField(
         max_length=300,
-        blank=True
     )
 
     open_question = models.BooleanField(
